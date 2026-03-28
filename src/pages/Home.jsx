@@ -7,15 +7,17 @@ export default function Home() {
   ];
 
   return (
-    <div className="py-20">
-      <h1 className="text-4xl font-bold text-center mb-10">
+    <div className="min-h-[80vh] flex flex-col items-center justify-center px-6">
+      <div className="max-w-4xl w-full text-center">
+      <h1 className="text-5xl font-extrabold text-center mb-12 bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
         Subscription Plans
       </h1>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-10 justify-center">
         {plans.map((plan) => (
           <PlanCard key={plan.id} plan={plan} />
         ))}
+      </div>
       </div>
     </div>
   );
