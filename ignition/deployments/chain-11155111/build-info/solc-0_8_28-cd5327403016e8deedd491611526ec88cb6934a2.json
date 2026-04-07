@@ -1,0 +1,40 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-cd5327403016e8deedd491611526ec88cb6934a2",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "compilerType": "solc",
+  "userSourceNameMap": {
+    "contracts/Subscription.sol": "project/contracts/Subscription.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/Subscription.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\ncontract Subscription {\n    address public owner;\n\n    constructor() {\n        owner = msg.sender;\n    }\n\n    struct Plan {\n        uint256 id;\n        string name;\n        uint256 price;     // in wei\n        uint256 duration;  // in seconds\n    }\n\n    struct SubscriptionInfo {\n        address user;\n        uint256 planId;\n        uint256 startDate;\n        uint256 endDate;   // ← Added: better to track expiry\n        bool active;\n    }\n\n    uint256 public planCount;\n    mapping(uint256 => Plan) public plans;\n    mapping(address => SubscriptionInfo) public subscriptions;\n\n    event PlanCreated(uint256 planId, string name, uint256 price, uint256 duration);\n    event Subscribed(address indexed user, uint256 planId, uint256 endDate);\n    event SubscriptionCancelled(address indexed user);\n\n    modifier onlyOwner() {\n        require(msg.sender == owner, \"Only owner allowed\");\n        _;\n    }\n\n    function createPlan(\n        string memory _name,\n        uint256 _price,\n        uint256 _duration\n    ) public onlyOwner {\n        planCount++;\n        plans[planCount] = Plan(planCount, _name, _price, _duration);\n        emit PlanCreated(planCount, _name, _price, _duration);\n    }\n\n    function subscribe(uint256 _planId) public payable {\n        Plan memory plan = plans[_planId];\n        require(plan.price > 0, \"Plan does not exist\");\n        require(msg.value >= plan.price, \"Insufficient payment\");\n\n        uint256 endDate = block.timestamp + plan.duration;\n\n        subscriptions[msg.sender] = SubscriptionInfo(\n            msg.sender,\n            _planId,\n            block.timestamp,\n            endDate,\n            true\n        );\n\n        // Refund extra payment if any\n        if (msg.value > plan.price) {\n            payable(msg.sender).transfer(msg.value - plan.price);\n        }\n\n        emit Subscribed(msg.sender, _planId, endDate);\n    }\n\n    function cancelSubscription() public {\n        require(subscriptions[msg.sender].active, \"No active subscription\");\n        subscriptions[msg.sender].active = false;\n        emit SubscriptionCancelled(msg.sender);\n    }\n\n    // Optional: Check if subscription is still valid\n    function isSubscriptionActive(address _user) public view returns (bool) {\n        SubscriptionInfo memory sub = subscriptions[_user];\n        return sub.active && block.timestamp < sub.endDate;\n    }\n\n    function getSubscription(address _user)\n        public\n        view\n        returns (SubscriptionInfo memory)\n    {\n        return subscriptions[_user];\n    }\n\n    // Withdraw funds (owner only)\n    function withdraw() public onlyOwner {\n        payable(owner).transfer(address(this).balance);\n    }\n}"
+      }
+    }
+  }
+}
