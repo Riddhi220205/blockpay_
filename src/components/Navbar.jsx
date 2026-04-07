@@ -12,6 +12,9 @@ export default function Navbar() {
         <Link to="/" className="mr-6 hover:text-green-400 transition">
         Dashboard
         </Link>
+        <Link to="/select-service" className="mr-6 hover:text-green-400 transition">
+        Select Service
+        </Link>
         <Link to="/plans" className="mr-6 hover:text-green-400 transition">
         Plans
         </Link>

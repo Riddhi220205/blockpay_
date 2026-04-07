@@ -1,56 +1,103 @@
-export default function Plans() {
-  return (
-    <div className="relative min-h-screen px-6 py-20 overflow-hidden">
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-      {/* 🔥 Background Glow Effects */}
-      <div className="absolute top-0 left-1/2 w-[500px] h-[500px] bg-yellow-600/20 blur-[120px] rounded-full -translate-x-1/2"></div>
-      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-yellow-500/20 blur-[120px] rounded-full"></div>
+export default function Plans() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const selectedService = location.state?.service;
+  const [selectedPlan, setSelectedPlan] = useState(null); // ✅ NEW
+
+  if (!selectedService) {
+    return (
+      <div className="h-[80vh] flex flex-col items-center justify-center text-center gap-6">
+        <h1 className="text-3xl font-bold text-red-400">
+          No Service Selected
+        </h1>
+
+        <p className="text-gray-400">
+          Please select a service first to view plans.
+        </p>
+
+        <button
+          onClick={() => navigate("/select-service")}
+          className="px-6 py-3 bg-green-600 rounded-xl font-semibold hover:scale-105 transition"
+        >
+          Go to Services
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen px-6 py-12 text-white max-w-6xl mx-auto">
 
       {/* Heading */}
-      <div className="text-center mb-20 relative z-10">
-        <h1 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-yellow-400 to-blue-500 bg-clip-text text-transparent">
+      <div className="text-center mb-16">
+        <h1 className="text-4xl font-bold mb-2">
           Subscription Plans
         </h1>
-        <p className="text-gray-400 mt-4 text-lg">
+
+        <p className="text-gray-400">
           Choose a plan that fits your needs
         </p>
+
+        <h2 className="text-lg mt-4 text-teal-400">
+          Service: {selectedService}
+        </h2>
+
+        {/* ✅ SHOW SELECTED PLAN */}
+        {selectedPlan && (
+          <p className="mt-4 text-green-400 font-semibold text-lg">
+            Selected Plan: {selectedPlan}
+          </p>
+        )}
       </div>
 
       {/* Cards */}
-      <div className="relative z-10 max-w-6xl mx-auto grid md:grid-cols-2 gap-10">
+      <div className="grid md:grid-cols-2 gap-10">
 
         {/* BASIC */}
-        <div className="p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl hover:scale-105 transition duration-300 shadow-lg">
-
+        <div
+          onClick={() => setSelectedPlan("Basic")}
+          className={`p-8 rounded-3xl bg-gray-800 border cursor-pointer transition 
+          hover:scale-105 ${
+            selectedPlan === "Basic"
+              ? "border-green-400"
+              : "border-gray-600"
+          }`}
+        >
           <h2 className="text-2xl font-semibold mb-2">Basic</h2>
           <p className="text-gray-400 mb-6">Perfect for beginners</p>
 
-          <p className="text-4xl font-bold text-blue-400 mb-6">
+          <p className="text-3xl font-bold text-teal-400 mb-6">
             0.01 MATIC
           </p>
 
-          <button className="w-full py-3 rounded-xl bg-gradient-to-r from-green-600 to-blue-500 font-semibold hover:opacity-90 transition">
-            Subscribe
+          <button className="w-full py-3 rounded-xl bg-green-600 font-semibold">
+            Select Plan
           </button>
         </div>
 
         {/* PRO */}
-        <div className="p-8 rounded-3xl bg-gradient-to-br from-green-600/20 to-blue-500/20 border border-yellow-500/40 backdrop-blur-xl hover:scale-105 transition duration-300 shadow-2xl glow">
-
-          {/* Badge */}
-          <div className="absolute top-4 right-4 text-xs px-3 py-1 bg-yellow-600 rounded-full">
-            MOST POPULAR
-          </div>
-
+        <div
+          onClick={() => setSelectedPlan("Pro")}
+          className={`p-8 rounded-3xl bg-gray-800 border cursor-pointer transition 
+          hover:scale-105 ${
+            selectedPlan === "Pro"
+              ? "border-teal-400"
+              : "border-gray-600"
+          }`}
+        >
           <h2 className="text-2xl font-semibold mb-2">Pro</h2>
-          <p className="text-gray-300 mb-6">Best for power users</p>
+          <p className="text-gray-400 mb-6">Best for power users</p>
 
-          <p className="text-4xl font-bold text-white mb-6">
+          <p className="text-3xl font-bold text-white mb-6">
             0.05 MATIC
           </p>
 
-          <button className="w-full py-3 rounded-xl bg-white text-black font-semibold hover:bg-gray-200 transition">
-            Subscribe
+          <button className="w-full py-3 rounded-xl bg-teal-500 text-black font-semibold">
+            Select Plan
           </button>
         </div>
 
