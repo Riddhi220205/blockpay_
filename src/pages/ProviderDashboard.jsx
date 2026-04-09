@@ -1,38 +1,18 @@
 import { useAccount, useBalance } from "wagmi";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
-export default function Dashboard() {
+export default function ProviderDashboard() {
   const { address, isConnected } = useAccount();
   const { data, isLoading } = useBalance({ address });
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!isConnected) return;
-
-    const params = new URLSearchParams(window.location.search);
-    const role = params.get("role");
-
-    console.log("ROLE:", role);
-
-    // ✅ ONLY provider auto redirect
-    if (role === "provider") {
-      navigate("/provider-dashboard");
-    }
-
-    // ❌ DO NOT redirect consumer
-  }, [isConnected, navigate]);
-
-  // 🔐 Not connected
   if (!isConnected) {
     return (
       <div className="h-[80vh] flex flex-col items-center justify-center text-center gap-6 text-white">
-        <h1 className="text-4xl font-bold">
-          Welcome to BlockPay!!
-        </h1>
+        <h1 className="text-4xl font-bold">Provider Dashboard</h1>
         <p className="text-gray-400">
-          Use the "Connect Wallet" button above to continue
+          Connect your wallet to manage plans
         </p>
       </div>
     );
@@ -42,11 +22,11 @@ export default function Dashboard() {
     <div className="max-w-5xl mx-auto px-6 py-12 text-white">
 
       <h1 className="text-3xl md:text-4xl font-bold mb-10 text-center">
-        Consumer Dashboard
+        Provider Dashboard
       </h1>
 
       {/* Wallet + Balance */}
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-8 mb-12">
 
         <div className="p-6 rounded-2xl bg-gray-800 border border-gray-600 
           hover:scale-105 hover:border-teal-400 transition">
@@ -66,17 +46,25 @@ export default function Dashboard() {
 
       </div>
 
-      {/* Consumer Action */}
-      <div className="mt-12 text-center">
-        <h2 className="text-xl mb-4">Start Subscription</h2>
+      {/* Actions */}
+      <div className="flex flex-col md:flex-row gap-6 justify-center">
 
         <button
-          onClick={() => navigate("/select-service")}
+          onClick={() => navigate("/provider/create-plan")}
           className="px-8 py-3 rounded-xl bg-gray-800 border border-gray-600 
           hover:scale-105 hover:border-teal-400 transition"
         >
-          Choose a Service
+          ➕ Create Plan
         </button>
+
+        <button
+          onClick={() => navigate("/provider/manage-plans")}
+          className="px-8 py-3 rounded-xl bg-gray-800 border border-gray-600 
+          hover:scale-105 hover:border-teal-400 transition"
+        >
+          ⚙️ Manage Plans
+        </button>
+
       </div>
 
     </div>

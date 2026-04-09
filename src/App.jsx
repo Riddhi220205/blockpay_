@@ -2,6 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import Plans from "./pages/Plans";
+import ProviderDashboard from "./pages/ProviderDashboard";
+import CreatePlan from "./pages/CreatePlan";
+import ManagePlans from "./pages/ManagePlan";
 import RoleSelect from "./pages/RoleSelect";
 import SelectService from "./pages/SelectService";
 import { Toaster } from "react-hot-toast";
@@ -68,9 +71,13 @@ export default function App() {
           >
             <Routes>
               <Route path="/" element={<RoleSelect />} />
-              <Route path="/select-service" element={<SelectService />} />
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/select-service" element={<SelectService />} />
+              
               <Route path="/plans" element={<Plans />} />
+              <Route path="/provider-dashboard" element={<ProviderDashboard />} />
+              <Route path="/provider/create-plan" element={<CreatePlan />} />
+              <Route path="/provider/manage-plans" element={<ManagePlans />} />
             </Routes>
           </motion.div>
 

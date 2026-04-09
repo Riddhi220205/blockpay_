@@ -5,17 +5,17 @@ export default function RoleSelect() {
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen text-white overflow-hidden">
 
-      {/* 🧱 HARD RESET BACKGROUND (kills App.jsx background) */}
+      {/* 🧱 Hard reset background */}
       <div className="absolute inset-0 bg-[#020617]" />
 
-      {/* 🖼 Image background ONLY */}
+      {/* 🖼 Background image */}
       <img
         src="/identity.png"
         alt="background"
         className="absolute inset-0 w-full h-full object-cover opacity-40"
       />
 
-      {/* 🌑 Overlay for readability */}
+      {/* 🌑 Overlay */}
       <div className="absolute inset-0 bg-black/50" />
 
       {/* ✨ Content */}
@@ -30,6 +30,8 @@ export default function RoleSelect() {
         </h1>
 
         <div className="flex gap-8 mt-4">
+
+          {/* ✅ FIXED LINKS */}
           <Link to="/dashboard?role=consumer">
             <button className="px-8 py-3 rounded-xl bg-gray-800 border border-gray-600 hover:border-teal-400 hover:scale-105 transition">
               Consumer
@@ -41,6 +43,7 @@ export default function RoleSelect() {
               Service Provider
             </button>
           </Link>
+
         </div>
       </motion.div>
     </div>
