@@ -1,5 +1,9 @@
 import hardhatToolboxViemPlugin from "@nomicfoundation/hardhat-toolbox-viem";
-import { configVariable, defineConfig } from "hardhat/config";
+import { defineConfig } from "hardhat/config";
+import "dotenv/config";
+
+const PRIVATE_KEY = process.env.PRIVATE_KEY ?? "0x0000000000000000000000000000000000000000000000000000000000000000";
+const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL ?? "";
 
 export default defineConfig({
   plugins: [hardhatToolboxViemPlugin],
@@ -31,8 +35,8 @@ export default defineConfig({
     sepolia: {
       type: "http",
       chainType: "l1",
-      url: configVariable("SEPOLIA_RPC_URL"),
-      accounts: [configVariable("SEPOLIA_PRIVATE_KEY")],
+      url: SEPOLIA_RPC_URL,
+      accounts: [PRIVATE_KEY],
     },
   },
 });
