@@ -15,7 +15,8 @@ export default function Plans() {
   const navigate = useNavigate();
   const { isConnected } = useAccount();
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const { writeContract, isPending } = useWriteContract();
+  const [pendingPlanId, setPendingPlanId] = useState(null); // ← track which plan is pending
+  const { writeContract } = useWriteContract();
   const selectedService = location.state?.service;
 
   if (!selectedService) {
@@ -38,6 +39,9 @@ export default function Plans() {
       toast.error("Please connect your wallet first!");
       return;
     }
+
+    setPendingPlanId(plan.id); // ← mark this specific plan as pending
+
     writeContract(
       {
         address: CONTRACT_ADDRESS,
@@ -45,14 +49,17 @@ export default function Plans() {
         functionName: "subscribe",
         args: [BigInt(plan.id)],
         value: parseEther(plan.price),
+        gas: BigInt(100000),
       },
       {
         onSuccess: () => {
           toast.success(`Subscribed to ${plan.name} plan!`);
           setSelectedPlan(plan.name);
+          setPendingPlanId(null); // ← clear on success
         },
         onError: (err) => {
           toast.error(`Failed: ${err.message}`);
+          setPendingPlanId(null); // ← clear on error
         },
       }
     );
@@ -72,26 +79,30 @@ export default function Plans() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-10">
-        {PLANS.map((plan) => (
-          <div
-            key={plan.id}
-            onClick={() => setSelectedPlan(plan.name)}
-            className={`p-8 rounded-3xl bg-gray-800 border cursor-pointer transition hover:scale-105 ${
-              selectedPlan === plan.name ? "border-green-400" : "border-gray-600"
-            }`}
-          >
-            <h2 className="text-2xl font-semibold mb-2">{plan.name}</h2>
-            <p className="text-gray-400 mb-6">{plan.description}</p>
-            <p className="text-3xl font-bold text-teal-400 mb-6">{plan.price} ETH</p>
-            <button
-              onClick={(e) => { e.stopPropagation(); handleSubscribe(plan); }}
-              disabled={isPending}
-              className="w-full py-3 rounded-xl bg-green-600 font-semibold hover:bg-green-500 transition disabled:opacity-50"
+        {PLANS.map((plan) => {
+          const isThisPlanPending = pendingPlanId === plan.id; // ← per-plan check
+
+          return (
+            <div
+              key={plan.id}
+              onClick={() => setSelectedPlan(plan.name)}
+              className={`p-8 rounded-3xl bg-gray-800 border cursor-pointer transition hover:scale-105 ${
+                selectedPlan === plan.name ? "border-green-400" : "border-gray-600"
+              }`}
             >
-              {isPending ? "Confirming..." : "Subscribe"}
-            </button>
-          </div>
-        ))}
+              <h2 className="text-2xl font-semibold mb-2">{plan.name}</h2>
+              <p className="text-gray-400 mb-6">{plan.description}</p>
+              <p className="text-3xl font-bold text-teal-400 mb-6">{plan.price} ETH</p>
+              <button
+                onClick={(e) => { e.stopPropagation(); handleSubscribe(plan); }}
+                disabled={isThisPlanPending}
+                className="w-full py-3 rounded-xl bg-green-600 font-semibold hover:bg-green-500 transition disabled:opacity-50"
+              >
+                {isThisPlanPending ? "Confirming..." : "Subscribe"} 
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

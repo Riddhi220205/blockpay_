@@ -134,3 +134,26 @@ export const CONTRACT_ABI = [
     "type": "function"
   }
 ];
+
+// Frontend-only plan removal (no redeployment needed)
+export const getRemovedPlans = () => {
+  const removed = localStorage.getItem("removedPlans");
+  return removed ? JSON.parse(removed) : [];
+};
+
+export const removePlanLocally = (planId) => {
+  const removed = getRemovedPlans();
+  if (!removed.includes(planId)) {
+    removed.push(planId);
+    localStorage.setItem("removedPlans", JSON.stringify(removed));
+  }
+};
+
+export const isPlanRemoved = (planId) => {
+  return getRemovedPlans().includes(planId);
+};
+
+// Legacy exports for provider pages
+
+export const fetchAllPlans = async () => [];
+export const updatePlan = async () => {};
