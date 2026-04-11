@@ -27,12 +27,14 @@ export default function CreatePlan() {
     const durationInSeconds = BigInt(Number(duration) * 24 * 60 * 60);
 
     writeContract(
-      {
-        address: CONTRACT_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: "createPlan",
-        args: [name, parseEther(price), durationInSeconds],
-      },
+  {
+    address: CONTRACT_ADDRESS,
+    abi: CONTRACT_ABI,
+    functionName: "createPlan",
+    args: [name, parseEther(price), durationInSeconds],
+    maxPriorityFeePerGas: BigInt(25000000000), // ✅ add
+    maxFeePerGas: BigInt(30000000000),          // ✅ add
+  },
       {
         onSuccess: () => {
           toast.success(`Plan "${name}" created on blockchain!`);
@@ -76,12 +78,12 @@ export default function CreatePlan() {
         <div className="relative">
           <input
             type="number"
-            placeholder="Price in ETH (e.g. 0.01)"
+            placeholder="Price in POL (e.g. 0.01)"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             className="w-full p-4 rounded-xl bg-gray-800 border border-gray-600 focus:outline-none focus:border-teal-400"
           />
-          <span className="absolute right-4 top-4 text-gray-400">ETH</span>
+          <span className="absolute right-4 top-4 text-gray-400">POL</span>
         </div>
 
         <div className="relative">

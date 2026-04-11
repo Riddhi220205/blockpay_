@@ -18,7 +18,7 @@ export default function PlanCard({ plan }) {
   return (
     <div className="p-8 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 shadow-lg hover:scale-105 transition-all duration-300">
       <h2 className="text-2xl font-bold mb-2">{plan.name}</h2>
-      <p className="text-3xl font-extrabold text-purple-400">{plan.price} MATIC</p>
+      <p className="text-3xl font-extrabold text-purple-400">{plan.price} POL</p>
 
       <button
         onClick={handleSubscribe}

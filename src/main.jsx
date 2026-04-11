@@ -6,16 +6,16 @@ import "./index.css";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
-import { sepolia } from "wagmi/chains";
+import { polygonAmoy } from "wagmi/chains"; // ✅ changed
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http } from "viem";
 
 export const config = getDefaultConfig({
   appName: "BlockPay",
   projectId: "8805d7caa8594b15fa241f1cdfd42270",
-  chains: [sepolia],
+  chains: [polygonAmoy], // ✅ changed
   transports: {
-    [sepolia.id]: http(),
+    [polygonAmoy.id]: http(), // ✅ changed
   },
 });
 

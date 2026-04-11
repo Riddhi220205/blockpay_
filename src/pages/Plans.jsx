@@ -42,15 +42,17 @@ export default function Plans() {
 
     setPendingPlanId(plan.id); // ← mark this specific plan as pending
 
-    writeContract(
-      {
-        address: CONTRACT_ADDRESS,
-        abi: CONTRACT_ABI,
-        functionName: "subscribe",
-        args: [BigInt(plan.id)],
-        value: parseEther(plan.price),
-        gas: BigInt(100000),
-      },
+   writeContract(
+  {
+    address: CONTRACT_ADDRESS,
+    abi: CONTRACT_ABI,
+    functionName: "subscribe",
+    args: [BigInt(plan.id)],
+    value: parseEther(plan.price),
+    gas: BigInt(100000),
+    maxPriorityFeePerGas: BigInt(25000000000), // 2.5 gwei
+    maxFeePerGas: BigInt(30000000000),          // ✅ add this (3 gwei, must be >= priority fee)
+  },
       {
         onSuccess: () => {
           toast.success(`Subscribed to ${plan.name} plan!`);
@@ -92,7 +94,7 @@ export default function Plans() {
             >
               <h2 className="text-2xl font-semibold mb-2">{plan.name}</h2>
               <p className="text-gray-400 mb-6">{plan.description}</p>
-              <p className="text-3xl font-bold text-teal-400 mb-6">{plan.price} ETH</p>
+              <p className="text-3xl font-bold text-teal-400 mb-6">{plan.price} POL</p>
               <button
                 onClick={(e) => { e.stopPropagation(); handleSubscribe(plan); }}
                 disabled={isThisPlanPending}
