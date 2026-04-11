@@ -3,7 +3,7 @@ import { defineConfig } from "hardhat/config";
 import "dotenv/config";
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY ?? "0x0000000000000000000000000000000000000000000000000000000000000000";
-const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL ?? "";
+const POLYGON_AMOY_RPC_URL = process.env.POLYGON_AMOY_RPC_URL ?? "https://rpc-amoy.polygon.technology";
 
 export default defineConfig({
   plugins: [hardhatToolboxViemPlugin],
@@ -32,10 +32,10 @@ export default defineConfig({
       type: "edr-simulated",
       chainType: "op",
     },
-    sepolia: {
+    polygonAmoy: {
       type: "http",
       chainType: "l1",
-      url: SEPOLIA_RPC_URL,
+      url: POLYGON_AMOY_RPC_URL,
       accounts: [PRIVATE_KEY],
     },
   },

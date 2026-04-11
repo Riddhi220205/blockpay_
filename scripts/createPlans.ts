@@ -1,6 +1,6 @@
 import { createWalletClient, createPublicClient, http, parseEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { sepolia } from "viem/chains";
+import { polygonAmoy } from "viem/chains";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import * as dotenv from "dotenv";
@@ -13,20 +13,20 @@ const abi = JSON.parse(
   )
 ).abi;
 
-const CONTRACT_ADDRESS = "0x105bED1Ecf73f1522A922dE89994077bcFf6a0EE" as `0x${string}`;
+const CONTRACT_ADDRESS = "0x5AD783a64c18e88dCACC7c9A61AcfE6DB3afE79A" as `0x${string}`;
 
 async function main() {
   const account = privateKeyToAccount(process.env.PRIVATE_KEY as `0x${string}`);
 
   const walletClient = createWalletClient({
     account,
-    chain: sepolia,
-    transport: http(process.env.SEPOLIA_RPC_URL),
+    chain: polygonAmoy, // ✅ changed
+    transport: http(process.env.POLYGON_AMOY_RPC_URL), // ✅ changed
   });
 
   const publicClient = createPublicClient({
-    chain: sepolia,
-    transport: http(process.env.SEPOLIA_RPC_URL),
+    chain: polygonAmoy, // ✅ changed
+    transport: http(process.env.POLYGON_AMOY_RPC_URL), 
   });
 
   console.log("Creating Basic plan...");
