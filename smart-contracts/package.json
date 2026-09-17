@@ -1,0 +1,34 @@
+{
+  "name": "blockpay-contracts",
+  "version": "1.0.0",
+  "description": "Solidity subscription contract and Hardhat project for BlockPay, deployed on Polygon Amoy.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:amoy": "hardhat ignition deploy ignition/modules/Subscription.ts --network polygonAmoy",
+    "create-plans": "hardhat run scripts/createPlans.ts --network polygonAmoy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Riddhi220205/blockpay_.git"
+  },
+  "keywords": ["blockchain", "solidity", "hardhat", "polygon", "subscriptions"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^3.1.1",
+    "@nomicfoundation/hardhat-toolbox": "^7.0.0",
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.3",
+    "@types/node": "^22.19.17",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.4",
+    "hardhat": "^3.3.0",
+    "typescript": "~5.8.0",
+    "viem": "^2.47.10"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.1",
+    "ethers": "^6.16.0"
+  }
+}
