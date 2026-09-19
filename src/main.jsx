@@ -4,28 +4,36 @@ import App from "./App";
 import "./index.css";
 
 import "@rainbow-me/rainbowkit/styles.css";
-import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { getDefaultConfig, RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
-import { polygonAmoy } from "wagmi/chains"; // ✅ changed
+import { polygonAmoy } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http } from "viem";
 
 export const config = getDefaultConfig({
   appName: "BlockPay",
   projectId: "8805d7caa8594b15fa241f1cdfd42270",
-  chains: [polygonAmoy], // ✅ changed
+  chains: [polygonAmoy],
   transports: {
-    [polygonAmoy.id]: http(), // ✅ changed
+    [polygonAmoy.id]: http(),
   },
 });
 
 const queryClient = new QueryClient();
 
+const rainbowTheme = darkTheme({
+  accentColor: "#2dd4bf",
+  accentColorForeground: "#081410",
+  borderRadius: "medium",
+  fontStack: "system",
+  overlayBlur: "small",
+});
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
+        <RainbowKitProvider theme={rainbowTheme}>
           <App />
         </RainbowKitProvider>
       </QueryClientProvider>

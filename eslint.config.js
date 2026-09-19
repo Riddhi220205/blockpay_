@@ -23,7 +23,17 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': [
+        'error',
+        {
+          // Component-like bindings (PascalCase) and the framer-motion JSX
+          // namespace are only ever referenced as JSX tag names
+          // (`<Foo />`, `<motion.div />`), which this rule's scope analysis
+          // doesn't trace through — so they're allow-listed by name instead.
+          varsIgnorePattern: '^[A-Z_]|^motion$',
+          argsIgnorePattern: '^[A-Z_]',
+        },
+      ],
     },
   },
 ])
