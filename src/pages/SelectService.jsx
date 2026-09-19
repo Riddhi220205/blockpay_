@@ -1,74 +1,68 @@
 import { useNavigate } from "react-router-dom";
+import { PageHeader, FadeIn } from "../components/ui";
+import { BoltIcon, PhoneIcon, CarIcon, BikeIcon, HeartIcon, ShieldIcon, ArrowRightIcon } from "../components/icons";
+
+const utilities = [
+  { name: "Electricity Bill", icon: BoltIcon },
+  { name: "Mobile Recharge", icon: PhoneIcon },
+];
+
+const insurance = [
+  { name: "Car Insurance", icon: CarIcon },
+  { name: "Bike Insurance", icon: BikeIcon },
+  { name: "Health Insurance", icon: HeartIcon },
+  { name: "Life Insurance", icon: ShieldIcon },
+];
+
+function ServiceCard({ name, Icon, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="group flex items-center gap-4 rounded-2xl border border-line bg-surface p-5 text-left transition-all hover:border-teal-400/40 hover:shadow-glow"
+    >
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-400/10 text-teal-300">
+        <Icon className="h-5 w-5" />
+      </div>
+      <span className="font-medium text-paper">{name}</span>
+      <ArrowRightIcon className="ml-auto h-4 w-4 text-paper-faint opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
+    </button>
+  );
+}
 
 export default function SelectService() {
   const navigate = useNavigate();
-
-  const utilities = [
-    "Electricity Bill",
-    "Mobile Recharge",
-  ];
-
-  const insurance = [
-    "Car Insurance",
-    "Bike Insurance",
-    "Health Insurance",
-    "Life Insurance",
-  ];
-
-  const handleSelect = (service) => {
-    navigate("/plans", { state: { service } });
-  };
+  const handleSelect = (service) => navigate("/plans", { state: { service } });
 
   return (
-    
-    <div className="min-h-screen max-w-5xl mx-auto px-6 py-12 text-white">
-      
-      <h1 className="text-3xl md:text-4xl font-bold mb-10 text-center text-white">
-        Select the service you want to subscribe
-      </h1>
+    <div className="mx-auto max-w-6xl px-6 py-10 md:px-10">
+      <PageHeader
+        title="Select a service"
+        subtitle="Pick what you'd like to subscribe to. You'll choose a plan next."
+      />
 
-    
-      <div className="mb-12">
-        <h2 className="text-xl font-semibold mb-6 text-purple-300">
-          ⚡ Utility Services
+      <FadeIn>
+        <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-semibold text-paper">
+          <BoltIcon className="h-5 w-5 text-teal-400" />
+          Utility services
         </h2>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {utilities.map((service, i) => (
-            <div
-              key={i}
-              onClick={() => handleSelect(service)}
-              className="p-6 rounded-2xl bg-gray-800 border border-gray-600 hover:scale-105 hover:border-purple-400 transition cursor-pointer"
-            >
-              <h2 className="text-lg font-semibold text-white">
-                {service}
-              </h2>
-            </div>
+        <div className="mb-10 grid gap-4 sm:grid-cols-2">
+          {utilities.map(({ name, icon }) => (
+            <ServiceCard key={name} name={name} Icon={icon} onClick={() => handleSelect(name)} />
           ))}
         </div>
-      </div>
+      </FadeIn>
 
-      
-      <div>
-        <h2 className="text-xl font-semibold mb-6 text-blue-300">
-           🛡 Insurance
+      <FadeIn delay={0.08}>
+        <h2 className="mb-4 flex items-center gap-2 font-display text-lg font-semibold text-paper">
+          <ShieldIcon className="h-5 w-5 text-teal-400" />
+          Insurance
         </h2>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          {insurance.map((service, i) => (
-            <div
-              key={i}
-              onClick={() => handleSelect(service)}
-              className="p-6 rounded-2xl bg-gray-800 border border-gray-600 hover:scale-105 hover:border-blue-400 transition cursor-pointer"
-            >
-              <h2 className="text-lg font-semibold text-white">
-                {service}
-              </h2>
-            </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {insurance.map(({ name, icon }) => (
+            <ServiceCard key={name} name={name} Icon={icon} onClick={() => handleSelect(name)} />
           ))}
         </div>
-      </div>
-
+      </FadeIn>
     </div>
   );
 }

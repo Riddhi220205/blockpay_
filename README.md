@@ -12,7 +12,7 @@ Team Name: TripleHash
 Team Roles
 Blockchain Developer
 Develops smart contracts for subscription management
-Deploys and tests contracts on Sepolia test network
+Deploys and tests contracts on the Polygon Amoy test network
 Ensures security and correctness of transaction logic
 Frontend Developer
 Builds the web interface using React
@@ -24,13 +24,13 @@ Handles testing and debugging
 Prepares documentation and architecture diagrams
 🌐 Blockchain Platform
 
-This project uses the Sepolia Test Network (Ethereum).
+This project uses Polygon Amoy, Polygon's public testnet.
 
-Sepolia is a public Ethereum testnet used for development and testing. It allows us to:
+Polygon Amoy is a Layer-2 network that mirrors mainnet Polygon while letting us:
 
 Simulate real blockchain transactions
 Test smart contracts safely
-Avoid real transaction costs
+Avoid real transaction costs, with much lower gas fees than testing directly on Ethereum
 💡 Problem Statement
 
 Traditional subscription systems:
@@ -80,7 +80,7 @@ Metadata
 Analytics
 Service provider info
 5. Blockchain Network
-Sepolia testnet
+Polygon Amoy testnet
 Executes smart contracts
 Stores immutable transaction data
 🛠️ Tech Stack
@@ -96,60 +96,59 @@ Blockchain
 Solidity
 Hardhat
 MetaMask
-Sepolia Testnet
+Polygon Amoy Testnet
 📂 Project Structure
-├── frontend/
-│   ├── src/
+├── src/                  # frontend (this is the app root — see below)
 │   ├── components/
 │   ├── pages/
+│   ├── hooks/
+│   ├── blockchain/       # ABI + deployed address the frontend calls
 │
-├── backend/
-│   ├── routes/
-│   ├── controllers/
-│
-├── contracts/
-│   ├── Subscription.sol
-│
-├── scripts/
-├── ignition/
-├── hardhat.config.js
+├── smart-contracts/      # Hardhat project
+│   ├── contracts/
+│   │   ├── Subscription.sol
+│   ├── test/
+│   ├── scripts/
+│   ├── ignition/
+│   ├── hardhat.config.ts
 ⚡ Getting Started
 🔧 Prerequisites
 
 Make sure you have installed:
 
-Node.js (v16+)
-npm / yarn
+Node.js (v18+)
+npm
 MetaMask browser extension
-Sepolia test ETH (from faucet)
+Polygon Amoy test POL (from the Polygon faucet)
 🖥️ Frontend Setup
-cd blockpay-frontend
+
+From the repo root:
+
 npm install
 npm run dev
 
 App will run on:
 
 http://localhost:5173
-⚙️ Backend Setup (if applicable)
-cd backend
-npm install
-npm start
 ⛓️ Smart Contract Setup
+
+The contract is already deployed to Polygon Amoy (see smart-contracts/README.md for the address), so the frontend works out of the box. To compile, test, or redeploy it yourself:
+
+cd smart-contracts
 npm install
-npx hardhat compile
-Deploy to Sepolia
-npx hardhat run scripts/deploy.js --network sepolia
+npm run compile
+npm test
+npm run deploy:amoy
 🔐 Environment Variables
 
-Create a .env file:
+Smart contract deployment reads a .env file inside smart-contracts/ (see smart-contracts/.env.example):
 
-SEPOLIA_RPC_URL=your_rpc_url
 PRIVATE_KEY=your_wallet_private_key
-CONTRACT_ADDRESS=deployed_contract_address
+POLYGON_AMOY_RPC_URL=https://rpc-amoy.polygon.technology
 🔗 Wallet Setup
 Install MetaMask
-Switch network to Sepolia Testnet
-Add test ETH from faucet
+Switch network to Polygon Amoy Testnet
+Add test POL from the faucet
 Connect wallet in the app
 🔄 Workflow
 User connects wallet

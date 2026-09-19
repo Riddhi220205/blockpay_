@@ -2,12 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 🌌 Global Background */
-body {
-  @apply bg-[#020617] text-white;
+@layer base {
+  * {
+    @apply border-line;
+  }
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-canvas text-paper font-sans antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
+  ::selection {
+    @apply bg-teal-400/30 text-paper;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-canvas;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-2 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-line;
+  }
 }
 
-/* ✨ Glow effect utility */
-.glow {
-  box-shadow: 0 0 60px rgba(207, 170, 241, 0.3);
+@layer components {
+  /* Base surface used for grouped content. One elevation step above canvas. */
+  .panel {
+    @apply bg-surface border border-line rounded-2xl;
+  }
+
+  /* Primary call-to-action */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-teal-400 to-teal-600
+           px-5 py-2.5 font-semibold text-canvas transition
+           hover:from-teal-300 hover:to-teal-500
+           disabled:opacity-40 disabled:pointer-events-none;
+  }
+
+  /* Secondary action on a dark surface */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line
+           bg-surface px-5 py-2.5 font-semibold text-paper transition
+           hover:border-teal-400/40 hover:bg-surface-2
+           disabled:opacity-40 disabled:pointer-events-none;
+  }
+
+  .btn-violet {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-violet-400 to-violet-600
+           px-5 py-2.5 font-semibold text-canvas transition
+           hover:from-violet-300 hover:to-violet-500
+           disabled:opacity-40 disabled:pointer-events-none;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-line bg-surface px-4 py-2.5 text-paper placeholder:text-paper-faint
+           outline-none transition focus:border-teal-400/50 focus:ring-2 focus:ring-teal-400/10;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-paper-muted;
+  }
+
+  /* Wallet addresses, hashes, on-chain amounts */
+  .data-text {
+    @apply font-mono tabular-nums;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-paper-muted;
+  }
+
+  /* Faint dot-grid canvas texture, used once per page shell rather than per-card */
+  .grid-canvas {
+    background-image: radial-gradient(rgba(234, 243, 240, 0.07) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
 }
