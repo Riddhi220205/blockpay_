@@ -4,21 +4,23 @@ import { useReadContract, usePublicClient } from "wagmi";
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from "../blockchain/contract";
 import { formatEther } from "viem";
 import { useEffect, useState } from "react";
+import { PageHeader, StatRow, StatBlock, Spinner } from "../components/ui";
+import { BriefcaseIcon, ArrowRightIcon } from "../components/icons";
 
 function BarChart({ data }) {
   const max = Math.max(...data.map((d) => d.value), 1);
   return (
-    <div className="flex items-end gap-3 h-40 mt-4">
+    <div className="mt-4 flex h-40 items-end gap-3">
       {data.map((d, i) => (
-        <div key={i} className="flex flex-col items-center flex-1 gap-2">
-          <span className="text-xs text-teal-400 font-bold">{d.value}</span>
-          <div className="w-full rounded-t-lg bg-gray-700 relative overflow-hidden" style={{ height: "100px" }}>
+        <div key={i} className="flex flex-1 flex-col items-center gap-2">
+          <span className="text-xs font-semibold text-teal-300">{d.value}</span>
+          <div className="relative w-full overflow-hidden rounded-t-lg bg-surface-2" style={{ height: "100px" }}>
             <div
               className="absolute bottom-0 w-full rounded-t-lg bg-gradient-to-t from-teal-600 to-teal-400 transition-all duration-700"
               style={{ height: `${(d.value / max) * 100}%` }}
             />
           </div>
-          <span className="text-xs text-gray-400 text-center leading-tight">{d.label}</span>
+          <span className="text-center text-xs leading-tight text-paper-muted">{d.label}</span>
         </div>
       ))}
     </div>
@@ -27,20 +29,20 @@ function BarChart({ data }) {
 
 function DonutChart({ data }) {
   const total = data.reduce((s, d) => s + d.value, 0) || 1;
-  const colors = ["#14b8a6", "#06b6d4", "#818cf8", "#f472b6", "#fb923c"];
-  let cumulative = 0;
-  const segments = data.map((d, i) => {
+  const colors = ["#2dd4bf", "#a78bfa", "#5eead4", "#c4b5fd", "#0d9488"];
+  const segments = data.reduce((acc, d, i) => {
     const pct = (d.value / total) * 100;
-    const seg = { ...d, pct, offset: cumulative, color: colors[i % colors.length] };
-    cumulative += pct;
-    return seg;
-  });
+    const prev = acc[i - 1];
+    const offset = prev ? prev.offset + prev.pct : 0;
+    acc.push({ ...d, pct, offset, color: colors[i % colors.length] });
+    return acc;
+  }, []);
   const r = 40, cx = 60, cy = 60, circ = 2 * Math.PI * r;
 
   return (
     <div className="flex items-center gap-6">
       <svg width="120" height="120" viewBox="0 0 120 120">
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#1f2937" strokeWidth="18" />
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#152A24" strokeWidth="18" />
         {segments.map((s, i) => (
           <circle
             key={i}
@@ -53,32 +55,22 @@ function DonutChart({ data }) {
             transform={`rotate(-90 ${cx} ${cy})`}
           />
         ))}
-        <text x={cx} y={cy + 5} textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
+        <text x={cx} y={cy + 5} textAnchor="middle" fill="#EAF3F0" fontSize="14" fontWeight="bold">
           {total}
         </text>
-        <text x={cx} y={cy + 18} textAnchor="middle" fill="#9ca3af" fontSize="8">
+        <text x={cx} y={cy + 18} textAnchor="middle" fill="#8CA79E" fontSize="8">
           total
         </text>
       </svg>
       <div className="flex flex-col gap-2">
         {segments.map((s, i) => (
           <div key={i} className="flex items-center gap-2 text-sm">
-            <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: s.color }} />
-            <span className="text-gray-300">{s.label}</span>
-            <span className="text-gray-500 ml-auto pl-4">{s.value}</span>
+            <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: s.color }} />
+            <span className="text-paper-muted">{s.label}</span>
+            <span className="ml-auto pl-4 data-text text-paper-faint">{s.value}</span>
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-function StatCard({ label, value, sub, accent }) {
-  return (
-    <div className="p-6 rounded-2xl bg-gray-800/80 border border-gray-700 hover:border-teal-500 hover:scale-105 transition-all duration-300 backdrop-blur-sm">
-      <p className="text-gray-400 text-sm mb-1">{label}</p>
-      <p className={`text-3xl font-bold ${accent || "text-teal-400"}`}>{value}</p>
-      {sub && <p className="text-gray-500 text-xs mt-1">{sub}</p>}
     </div>
   );
 }
@@ -114,7 +106,9 @@ export default function ProviderAnalytics() {
             args: [BigInt(i)],
           });
           results.push({ id: i, name: plan[1], price: plan[2], duration: plan[3] });
-        } catch {}
+        } catch {
+          // Skip any plan ID that fails to read rather than aborting the whole loop
+        }
       }
       setPlans(results);
     };
@@ -174,9 +168,12 @@ export default function ProviderAnalytics() {
 
   if (!isConnected) {
     return (
-      <div className="h-[80vh] flex flex-col items-center justify-center text-center gap-6 text-white">
-        <h1 className="text-4xl font-bold">Analytics</h1>
-        <p className="text-gray-400">Connect your wallet to view analytics</p>
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-center px-6 py-24 text-center">
+        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-400/10 text-violet-300">
+          <BriefcaseIcon className="h-7 w-7" />
+        </div>
+        <h1 className="font-display text-3xl font-semibold text-paper">Analytics</h1>
+        <p className="mt-3 max-w-sm text-paper-muted">Connect your wallet to view analytics.</p>
       </div>
     );
   }
@@ -188,81 +185,80 @@ export default function ProviderAnalytics() {
     .map((p) => ({ label: p.name, value: subscribersByPlan[p.id] || 0 }));
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12 text-white">
-      <div className="flex items-center justify-between mb-10">
-        <div>
-          <h1 className="text-4xl font-bold">Analytics</h1>
-          <p className="text-gray-400 mt-1">Live data from the blockchain</p>
-        </div>
-        <button
-          onClick={() => navigate("/provider-dashboard")}
-          className="px-5 py-2 rounded-xl bg-gray-800 border border-gray-600 hover:border-teal-400 transition text-sm"
-        >
-          ← Dashboard
-        </button>
-      </div>
+    <div className="mx-auto max-w-6xl px-6 py-10 md:px-10">
+      <PageHeader
+        accent="violet"
+        title="Analytics"
+        subtitle="Live data, read straight from contract events."
+        action={
+          <button onClick={() => navigate("/provider-dashboard")} className="btn-ghost">
+            <ArrowRightIcon className="h-4 w-4 rotate-180" />
+            Dashboard
+          </button>
+        }
+      />
 
       {loading ? (
-        <div className="flex items-center justify-center h-60 text-teal-400 text-lg animate-pulse">
-          Reading blockchain data...
+        <div className="panel">
+          <Spinner label="Reading blockchain data" />
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
-            <StatCard label="Total Subscribers" value={totalSubs} sub="all time" />
-            <StatCard label="Active Plans" value={plans.length} sub="on-chain" />
-            <StatCard
-              label="Total Revenue"
-              value={`${parseFloat(formatEther(totalRevenue)).toFixed(4)} ETH`}
-              sub="from subscriptions"
-              accent="text-cyan-400"
+          <StatRow>
+            <StatBlock accent="violet" label="Total subscribers" value={totalSubs} hint="all time" />
+            <StatBlock accent="violet" label="Active plans" value={plans.length} hint="on-chain" />
+            <StatBlock
+              accent="violet"
+              label="Total revenue"
+              value={`${parseFloat(formatEther(totalRevenue)).toFixed(4)} POL`}
+              hint="from subscriptions"
             />
-            <StatCard
-              label="Wallet Balance"
-              value={`${parseFloat(balanceData?.formatted || 0).toFixed(4)} ETH`}
-              sub="current"
-              accent="text-purple-400"
+            <StatBlock
+              accent="violet"
+              label="Wallet balance"
+              value={`${parseFloat(balanceData?.formatted || 0).toFixed(4)} POL`}
+              hint="current"
             />
-          </div>
+          </StatRow>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-10">
-            <div className="p-6 rounded-2xl bg-gray-800/80 border border-gray-700">
-              <h2 className="text-lg font-semibold mb-1">Subscribers per Plan</h2>
-              <p className="text-gray-500 text-xs mb-2">How many users chose each plan</p>
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <div className="panel p-6">
+              <h2 className="font-display text-lg font-semibold text-paper">Subscribers per plan</h2>
+              <p className="mb-2 text-xs text-paper-muted">How many users chose each plan</p>
               {barData.length > 0 ? <BarChart data={barData} /> : (
-                <p className="text-gray-500 mt-8 text-center">No subscription data yet</p>
+                <p className="mt-8 text-center text-paper-faint">No subscription data yet</p>
               )}
             </div>
-            <div className="p-6 rounded-2xl bg-gray-800/80 border border-gray-700">
-              <h2 className="text-lg font-semibold mb-1">Plan Distribution</h2>
-              <p className="text-gray-500 text-xs mb-4">Share of subscribers across plans</p>
+            <div className="panel p-6">
+              <h2 className="font-display text-lg font-semibold text-paper">Plan distribution</h2>
+              <p className="mb-4 text-xs text-paper-muted">Share of subscribers across plans</p>
               {donutData.length > 0 ? <DonutChart data={donutData} /> : (
-                <p className="text-gray-500 mt-8 text-center">No subscription data yet</p>
+                <p className="mt-8 text-center text-paper-faint">No subscription data yet</p>
               )}
             </div>
           </div>
 
-          <div className="p-6 rounded-2xl bg-gray-800/80 border border-gray-700 mb-8">
-            <h2 className="text-lg font-semibold mb-4">Plan Breakdown</h2>
+          <div className="panel mt-6 p-6">
+            <h2 className="mb-4 font-display text-lg font-semibold text-paper">Plan breakdown</h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
+              <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="text-gray-400 border-b border-gray-700">
-                    <th className="pb-3">Plan</th>
-                    <th className="pb-3">Price (ETH)</th>
-                    <th className="pb-3">Duration (days)</th>
-                    <th className="pb-3">Subscribers</th>
-                    <th className="pb-3">Revenue (ETH)</th>
+                  <tr className="border-b border-line text-paper-muted">
+                    <th className="pb-3 font-medium">Plan</th>
+                    <th className="pb-3 font-medium">Price (POL)</th>
+                    <th className="pb-3 font-medium">Duration (days)</th>
+                    <th className="pb-3 font-medium">Subscribers</th>
+                    <th className="pb-3 font-medium">Revenue (POL)</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-700">
+                <tbody className="divide-y divide-line-soft">
                   {plans.map((p) => (
-                    <tr key={p.id} className="hover:bg-gray-700/40 transition">
-                      <td className="py-3 font-medium">{p.name}</td>
-                      <td className="py-3 text-teal-400">{formatEther(p.price)}</td>
-                      <td className="py-3 text-gray-300">{Number(p.duration) / 86400}</td>
-                      <td className="py-3 text-cyan-400 font-bold">{subscribersByPlan[p.id] || 0}</td>
-                      <td className="py-3 text-purple-400">
+                    <tr key={p.id} className="transition hover:bg-surface-2/50">
+                      <td className="py-3 font-medium text-paper">{p.name}</td>
+                      <td className="py-3 data-text text-teal-300">{formatEther(p.price)}</td>
+                      <td className="py-3 text-paper-muted">{Number(p.duration) / 86400}</td>
+                      <td className="py-3 data-text font-semibold text-violet-300">{subscribersByPlan[p.id] || 0}</td>
+                      <td className="py-3 data-text text-paper">
                         {(parseFloat(formatEther(p.price)) * (subscribersByPlan[p.id] || 0)).toFixed(4)}
                       </td>
                     </tr>
@@ -272,30 +268,30 @@ export default function ProviderAnalytics() {
             </div>
           </div>
 
-          <div className="p-6 rounded-2xl bg-gray-800/80 border border-gray-700">
-            <h2 className="text-lg font-semibold mb-4">Recent Subscriptions</h2>
+          <div className="panel mt-6 p-6">
+            <h2 className="mb-4 font-display text-lg font-semibold text-paper">Recent subscriptions</h2>
             {recentSubs.length === 0 ? (
-              <p className="text-gray-500 text-center py-6">No subscriptions yet</p>
+              <p className="py-6 text-center text-paper-faint">No subscriptions yet</p>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left">
+                <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="text-gray-400 border-b border-gray-700">
-                      <th className="pb-3">Wallet</th>
-                      <th className="pb-3">Plan</th>
-                      <th className="pb-3">Amount</th>
-                      <th className="pb-3">Expires</th>
+                    <tr className="border-b border-line text-paper-muted">
+                      <th className="pb-3 font-medium">Wallet</th>
+                      <th className="pb-3 font-medium">Plan</th>
+                      <th className="pb-3 font-medium">Amount</th>
+                      <th className="pb-3 font-medium">Expires</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-700">
+                  <tbody className="divide-y divide-line-soft">
                     {recentSubs.map((s, i) => (
-                      <tr key={i} className="hover:bg-gray-700/40 transition">
-                        <td className="py-3 text-teal-400 font-mono text-xs">
+                      <tr key={i} className="transition hover:bg-surface-2/50">
+                        <td className="py-3 data-text text-xs text-teal-300">
                           {s.wallet.slice(0, 6)}...{s.wallet.slice(-4)}
                         </td>
-                        <td className="py-3">{s.planName}</td>
-                        <td className="py-3 text-cyan-400">{s.amount} ETH</td>
-                        <td className="py-3 text-gray-400">{s.endDate}</td>
+                        <td className="py-3 text-paper">{s.planName}</td>
+                        <td className="py-3 data-text text-violet-300">{s.amount} POL</td>
+                        <td className="py-3 text-paper-muted">{s.endDate}</td>
                       </tr>
                     ))}
                   </tbody>

@@ -4,6 +4,8 @@ import { useWriteContract, useAccount } from "wagmi";
 import { parseEther } from "viem";
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from "../blockchain/contract";
 import toast from "react-hot-toast";
+import { PageHeader, EmptyState } from "../components/ui";
+import { CheckIcon, PackageIcon } from "../components/icons";
 
 const PLANS = [
   { id: 1, name: "Basic", price: "0.01", description: "Perfect for beginners" },
@@ -15,21 +17,22 @@ export default function Plans() {
   const navigate = useNavigate();
   const { isConnected } = useAccount();
   const [selectedPlan, setSelectedPlan] = useState(null);
-  const [pendingPlanId, setPendingPlanId] = useState(null); // ← track which plan is pending
+  const [pendingPlanId, setPendingPlanId] = useState(null);
   const { writeContract } = useWriteContract();
   const selectedService = location.state?.service;
 
   if (!selectedService) {
     return (
-      <div className="h-[80vh] flex flex-col items-center justify-center text-center gap-6 text-white">
-        <h1 className="text-3xl font-bold text-red-400">No Service Selected</h1>
-        <p className="text-gray-400">Please select a service first to view plans.</p>
-        <button
-          onClick={() => navigate("/select-service")}
-          className="px-6 py-3 bg-green-600 rounded-xl font-semibold hover:scale-105 transition"
-        >
-          Go to Services
-        </button>
+      <div className="mx-auto max-w-6xl px-6 py-10 md:px-10">
+        <EmptyState
+          title="No service selected"
+          description="Pick a service first so we know what these plans apply to."
+          action={
+            <button onClick={() => navigate("/select-service")} className="btn-primary">
+              Go to services
+            </button>
+          }
+        />
       </div>
     );
   }
@@ -40,67 +43,81 @@ export default function Plans() {
       return;
     }
 
-    setPendingPlanId(plan.id); // ← mark this specific plan as pending
+    setPendingPlanId(plan.id);
 
-   writeContract(
-  {
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: "subscribe",
-    args: [BigInt(plan.id)],
-    value: parseEther(plan.price),
-    gas: BigInt(100000),
-    maxPriorityFeePerGas: BigInt(25000000000), // 2.5 gwei
-    maxFeePerGas: BigInt(30000000000),          // ✅ add this (3 gwei, must be >= priority fee)
-  },
+    writeContract(
+      {
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: "subscribe",
+        args: [BigInt(plan.id)],
+        value: parseEther(plan.price),
+        gas: BigInt(100000),
+        maxPriorityFeePerGas: BigInt(25000000000), // 2.5 gwei
+        maxFeePerGas: BigInt(30000000000), // 3 gwei, must be >= priority fee
+      },
       {
         onSuccess: () => {
           toast.success(`Subscribed to ${plan.name} plan!`);
           setSelectedPlan(plan.name);
-          setPendingPlanId(null); // ← clear on success
+          setPendingPlanId(null);
         },
         onError: (err) => {
           toast.error(`Failed: ${err.message}`);
-          setPendingPlanId(null); // ← clear on error
+          setPendingPlanId(null);
         },
       }
     );
   };
 
   return (
-    <div className="min-h-screen px-6 py-12 text-white max-w-6xl mx-auto">
-      <div className="text-center mb-16">
-        <h1 className="text-4xl font-bold mb-2">Subscription Plans</h1>
-        <p className="text-gray-400">Choose a plan that fits your needs</p>
-        <h2 className="text-lg mt-4 text-teal-400">Service: {selectedService}</h2>
-        {selectedPlan && (
-          <p className="mt-4 text-green-400 font-semibold text-lg">
-            ✅ Subscribed to: {selectedPlan}
-          </p>
-        )}
-      </div>
+    <div className="mx-auto max-w-6xl px-6 py-10 md:px-10">
+      <PageHeader
+        eyebrow={`Service: ${selectedService}`}
+        title="Choose a plan"
+        subtitle="Payment happens in one transaction, straight to the contract — no card, no processor."
+      />
 
-      <div className="grid md:grid-cols-2 gap-10">
+      {selectedPlan && (
+        <div className="mb-8 flex items-center gap-2 rounded-xl border border-teal-400/25 bg-teal-400/10 px-4 py-3 text-sm font-medium text-teal-300">
+          <CheckIcon className="h-4 w-4" />
+          Subscribed to {selectedPlan}
+        </div>
+      )}
+
+      <div className="grid gap-6 sm:grid-cols-2">
         {PLANS.map((plan) => {
-          const isThisPlanPending = pendingPlanId === plan.id; // ← per-plan check
+          const isThisPlanPending = pendingPlanId === plan.id;
+          const isPro = plan.name === "Pro";
 
           return (
             <div
               key={plan.id}
-              onClick={() => setSelectedPlan(plan.name)}
-              className={`p-8 rounded-3xl bg-gray-800 border cursor-pointer transition hover:scale-105 ${
-                selectedPlan === plan.name ? "border-green-400" : "border-gray-600"
+              className={`relative flex flex-col gap-6 rounded-3xl border p-8 transition-colors ${
+                isPro ? "border-teal-400/30 bg-surface" : "border-line bg-surface"
               }`}
             >
-              <h2 className="text-2xl font-semibold mb-2">{plan.name}</h2>
-              <p className="text-gray-400 mb-6">{plan.description}</p>
-              <p className="text-3xl font-bold text-teal-400 mb-6">{plan.price} POL</p>
+              {isPro && (
+                <span className="absolute -top-3 left-8 rounded-full bg-gradient-to-r from-teal-400 to-teal-600 px-3 py-1 text-xs font-semibold text-canvas">
+                  Most popular
+                </span>
+              )}
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-400/10 text-teal-300">
+                <PackageIcon className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="font-display text-2xl font-semibold text-paper">{plan.name}</h2>
+                <p className="mt-1 text-paper-muted">{plan.description}</p>
+              </div>
+              <p className="font-display text-4xl font-semibold text-paper">
+                {plan.price} <span className="text-lg font-medium text-paper-muted">POL</span>
+              </p>
               <button
-                onClick={(e) => { e.stopPropagation(); handleSubscribe(plan); }}
+                onClick={() => handleSubscribe(plan)}
                 disabled={isThisPlanPending}
-                className="w-full py-3 rounded-xl bg-green-600 font-semibold hover:bg-green-500 transition disabled:opacity-50"
+                className="btn-primary w-full"
               >
-                {isThisPlanPending ? "Confirming..." : "Subscribe"} 
+                {isThisPlanPending ? "Confirming…" : "Subscribe"}
               </button>
             </div>
           );
